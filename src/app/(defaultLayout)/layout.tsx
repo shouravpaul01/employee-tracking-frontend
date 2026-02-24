@@ -5,7 +5,7 @@ import React, { ReactNode } from 'react'
 
 export default function DefaultLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="container min-h-screen flex flex-col ">
+    <div className=" min-h-screen flex flex-col ">
       {/* Main Content */}
       <main className="flex-1 pb-20">
         {children}
