@@ -1,13 +1,13 @@
 // components/new-project-dialog.tsx
-"use client"
+"use client";
 
-import * as React from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { toast } from "sonner"
+import * as React from "react";
+import { FieldValues, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -16,47 +16,33 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
   Field,
   FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { projectStatus } from "@/contant";
+import { createProjectSchema } from "@/validation/project.validation";
 
-const formSchema = z.object({
-  projectName: z.string().min(1, "Project name is required"),
-  propertyAddress: z.string().min(1, "Property address is required"),
-  clientName: z.string().min(1, "Client name is required"),
-  status: z.string().min(1, "Status is required"),
-  lockboxInfo: z.string().optional(),
-  additionalNotes: z.string().optional(),
-})
-
-type FormValues = z.infer<typeof formSchema>
-
-const projectStatuses = [
-  "Walkthrough",
-  "Staging",
-  "Destaging",
-  "Completed",
-  "Pending",
-  "On Hold",
-]
-
-export function CreateProjectFormDialog({open,onOpenChange}:{open:boolean,onOpenChange:(value:boolean)=>void}) {
-
-  
+export function CreateProjectFormDialog({
+  open,
+  onOpenChange,
+}: {
+  open: boolean;
+  onOpenChange: (value: boolean) => void;
+}) {
   const {
     register,
     handleSubmit,
@@ -64,38 +50,39 @@ export function CreateProjectFormDialog({open,onOpenChange}:{open:boolean,onOpen
     reset,
     setValue,
     watch,
-  } = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+  } = useForm({
+    resolver: zodResolver(createProjectSchema),
     defaultValues: {
-      projectName: "",
+      name: "",
       propertyAddress: "",
       clientName: "",
       status: "Walkthrough",
-      lockboxInfo: "",
+      accessInfo: "",
       additionalNotes: "",
     },
-  })
+  });
 
-  const selectedStatus = watch("status")
+  const selectedStatus = watch("status");
 
-  function onSubmit(data: FormValues) {
+  function onSubmit(data: FieldValues) {
     toast("New project created!", {
       description: (
         <div className="mt-2 w-full">
-          <p><strong>{data.projectName}</strong> has been created successfully.</p>
+          <p>
+            <strong>{data.projectName}</strong> has been created successfully.
+          </p>
         </div>
       ),
       position: "bottom-right",
-    })
-    
-    console.log("Form data:", data)
-    onOpenChange(false)
-    reset()
+    });
+
+    console.log("Form data:", data);
+    onOpenChange(false);
+    reset();
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      
       <DialogContent className="sm:max-w-[500px] p-0 gap-0">
         {/* Fixed Header */}
         <DialogHeader className="px-6 py-4 border-b">
@@ -111,27 +98,27 @@ export function CreateProjectFormDialog({open,onOpenChange}:{open:boolean,onOpen
             <FieldGroup className="">
               {/* Project Name */}
               <Field>
-                <FieldLabel htmlFor="projectName" className="text-base ">
+                <FieldLabel htmlFor="projectName" className=" ">
                   Project Name
                 </FieldLabel>
-                
+
                 <Input
                   id="projectName"
                   placeholder="e.g Del Mar Coastal Villa"
-                  {...register("projectName")}
-                  className={errors.projectName ? "border-red-500" : ""}
+                  {...register("name")}
+                  className={errors.name ? "border-red-500" : ""}
                 />
-                {errors.projectName && (
-                  <FieldError errors={[errors.projectName]} />
+                {errors.name && (
+                  <FieldError errors={[errors.name]} />
                 )}
               </Field>
 
               {/* Property Address */}
               <Field>
-                <FieldLabel htmlFor="propertyAddress" className="text-base ">
+                <FieldLabel htmlFor="propertyAddress" >
                   Property Address
                 </FieldLabel>
-               
+
                 <Input
                   id="propertyAddress"
                   placeholder="1234 Ocean Blvd, Del Mar, CA"
@@ -145,10 +132,10 @@ export function CreateProjectFormDialog({open,onOpenChange}:{open:boolean,onOpen
 
               {/* Client Name */}
               <Field>
-                <FieldLabel htmlFor="clientName" className="text-base ">
+                <FieldLabel htmlFor="clientName" >
                   Client Name
                 </FieldLabel>
-               
+
                 <Input
                   id="clientName"
                   placeholder="Sarah Johnson"
@@ -162,10 +149,10 @@ export function CreateProjectFormDialog({open,onOpenChange}:{open:boolean,onOpen
 
               {/* Status */}
               <Field>
-                <FieldLabel htmlFor="status" className="text-base ">
+                <FieldLabel htmlFor="status" >
                   Status
                 </FieldLabel>
-                
+
                 <Select
                   onValueChange={(value) => setValue("status", value)}
                   defaultValue={selectedStatus}
@@ -174,37 +161,35 @@ export function CreateProjectFormDialog({open,onOpenChange}:{open:boolean,onOpen
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
-                    {projectStatuses.map((status) => (
-                      <SelectItem key={status} value={status}>
+                    {projectStatus.map((status) => (
+                      <SelectItem key={status} value={status.toUpperCase()}>
                         {status}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                {errors.status && (
-                  <FieldError errors={[errors.status]} />
-                )}
+                {errors.status && <FieldError errors={[errors.status]} />}
               </Field>
 
               {/* Lockbox/Access Info */}
               <Field>
-                <FieldLabel htmlFor="lockboxInfo" className="text-base ">
+                <FieldLabel htmlFor="lockboxInfo" >
                   Lockbox/Access Info
                 </FieldLabel>
-                
+
                 <Input
                   id="lockboxInfo"
                   placeholder="Code: 1234, front gate"
-                  {...register("lockboxInfo")}
+                  {...register("accessInfo")}
                 />
               </Field>
 
               {/* Additional Notes */}
               <Field>
-                <FieldLabel htmlFor="additionalNotes" className="text-base ">
+                <FieldLabel htmlFor="additionalNotes" >
                   Add Additional Notes
                 </FieldLabel>
-           
+
                 <Textarea
                   id="additionalNotes"
                   placeholder="Add extra notes about this project.."
@@ -217,7 +202,6 @@ export function CreateProjectFormDialog({open,onOpenChange}:{open:boolean,onOpen
 
           {/* Fixed Footer */}
           <DialogFooter className="px-6 py-4 border-t flex gap-2 sm:justify-between">
-           
             <Button type="submit" className="w-full">
               Create Project
             </Button>
@@ -225,5 +209,5 @@ export function CreateProjectFormDialog({open,onOpenChange}:{open:boolean,onOpen
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

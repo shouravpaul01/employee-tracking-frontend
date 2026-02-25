@@ -18,32 +18,30 @@ import {
 } from "@/components/ui/input-group";
 import ProjectCard from "@/components/Projects/ProjectCard";
 import { CreateProjectFormDialog } from "@/components/Projects/CreateProjectFormDialog";
+import Header from "@/components/shared/Header";
+import { projectStatus } from "@/contant";
 
 export default function Page() {
   const [activeTab, setActiveTab] = useState("All");
-   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
-  const projectStatus = [
-    "Walkthrough",
-    "Staging",
-    "Destaging",
-    "Completed",
-    "Pending",
-  ];
+  
 
   return (
     <div>
-      <div className="container flex border-b items-center py-2">
-        <h1 className="flex-1 text-lg font-semibold">Projects</h1>
-        <Button
-          variant={"ghost"}
-          size={"icon-sm"}
-          className="rounded-full text-primary hover:text-primary cursor-pointer"
-          onClick={()=>setCreateDialogOpen(true)}
-        >
-          <BadgePlus className="size-6" />
-        </Button>
-      </div>
+      <Header
+        title="Projects"
+        rightContent={
+          <Button
+            variant={"ghost"}
+            size={"icon-sm"}
+            className="rounded-full text-primary hover:text-primary cursor-pointer"
+            onClick={() => setCreateDialogOpen(true)}
+          >
+            <BadgePlus className="size-6" />
+          </Button>
+        }
+      />
 
       <div className="container py-3 space-y-5">
         <InputGroup className="h-12">
@@ -85,11 +83,14 @@ export default function Page() {
         </Tabs>
         <div className=" space-y-4 pb-10">
           {[...Array(10)].map((_, i) => (
-            <ProjectCard key={i} i={i}/>
+            <ProjectCard key={i} i={i} isClickable={true} />
           ))}
         </div>
       </div>
-      <CreateProjectFormDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} />
+      <CreateProjectFormDialog
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+      />
     </div>
   );
 }
