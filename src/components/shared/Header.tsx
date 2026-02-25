@@ -5,16 +5,19 @@ import Link from "next/link";
 
 export default function Header({
   title,
+  subTitle,
   backHref,
   rightContent,
 }: {
   title: string;
+  subTitle?: string;
   backHref?: string;
   rightContent?: ReactNode;
 }) {
   return (
     <div className="container flex border-b items-center py-2">
-      <div className="flex-1 flex items-center gap-2">
+      <div className="flex-1">
+<div className=" flex items-center gap-2">
         {backHref && (
           <Button
             asChild
@@ -28,7 +31,11 @@ export default function Header({
           </Button>
         )}
         <h1 className=" text-lg font-semibold text-neutral-700">{title}</h1>
+        
       </div>
+      {subTitle && <p className="text-neutral-500">{subTitle}</p>}
+      </div>
+      
       {rightContent}
     </div>
   );

@@ -16,8 +16,8 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import ProjectCard from "@/components/Projects/ProjectCard";
-import { CreateProjectFormDialog } from "@/components/Projects/CreateProjectFormDialog";
+import ProjectCard from "@/components/projects/ProjectCard";
+import { CreateProjectFormDialog } from "@/components/projects/CreateProjectFormDialog";
 import Header from "@/components/shared/Header";
 import { projectStatus } from "@/constant";
 

@@ -1,6 +1,6 @@
 "use client"
 
-import ExpensesCard from "@/components/Admin/Expenses/ExpensesCard";
+import ExpensesCard from "@/components/admin/expenses/ExpensesCard";
 import Header from "@/components/shared/Header";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { expensesStatus } from "@/constant";

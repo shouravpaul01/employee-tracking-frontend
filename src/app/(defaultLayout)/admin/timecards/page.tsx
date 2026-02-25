@@ -1,5 +1,6 @@
+import EmployeeWeeklyHourCard from "@/components/admin/timecards/EmployeeWeeklyHourCard";
 import Header from "@/components/shared/Header";
-import EmployeeWeeklyHourCard from "@/components/Timecards/Admin/EmployeeWeeklyHourCard";
+
 import { Button } from "@/components/ui/button";
 
 

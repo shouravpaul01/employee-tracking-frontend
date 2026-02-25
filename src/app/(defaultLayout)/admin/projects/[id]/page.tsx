@@ -1,5 +1,5 @@
 "use client"
-import ProjectCard from "@/components/Projects/ProjectCard";
+import ProjectCard from "@/components/projects/ProjectCard";
 import Header from "@/components/shared/Header";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import React, { useState } from "react";
