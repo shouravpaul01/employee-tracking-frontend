@@ -19,7 +19,7 @@ import {
 import ProjectCard from "@/components/Projects/ProjectCard";
 import { CreateProjectFormDialog } from "@/components/Projects/CreateProjectFormDialog";
 import Header from "@/components/shared/Header";
-import { projectStatus } from "@/contant";
+import { projectStatus } from "@/constant";
 
 export default function Page() {
   const [activeTab, setActiveTab] = useState("All");

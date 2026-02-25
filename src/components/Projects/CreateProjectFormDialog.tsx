@@ -33,7 +33,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { projectStatus } from "@/contant";
+import { projectStatus } from "@/constant";
 import { createProjectSchema } from "@/validation/project.validation";
 
 export function CreateProjectFormDialog({

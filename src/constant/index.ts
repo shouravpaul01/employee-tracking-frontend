@@ -5,3 +5,9 @@ export const projectStatus = [
     "Completed",
     "Pending",
   ];
+
+  export const expensesStatus=[
+    "Pending",
+    "Approved",
+    "Rejected"
+  ]
