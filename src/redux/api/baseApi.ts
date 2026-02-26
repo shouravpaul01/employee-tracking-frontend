@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { logout } from "../features/authSlice";
+import { RootState } from "../store";
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -9,6 +10,14 @@ if (!baseUrl) {
 
 const baseQuery = fetchBaseQuery({
   baseUrl,
+   prepareHeaders: (headers, { getState }) => {
+      const token = (getState() as RootState).auth.token;
+      if (token) {
+        headers.set("Authorization", `${token}`);
+      }
+      return headers;
+    },
+
   credentials: "include",
 });
 
