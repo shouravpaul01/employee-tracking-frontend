@@ -1,64 +1,65 @@
 "use client";
 
 import * as React from "react";
-import { Controller, FieldValues, useForm } from "react-hook-form";
+import { FieldValues, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Field,
   FieldError,
   FieldGroup,
   FieldLabel,
-
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import logo from "../../../../public/logo.png";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { loginSchema } from "@/validation/auth.validation";
-
-
-
+import { useLoginMutation } from "@/redux/api/authApi";
+import { Spinner } from "@/components/ui/spinner";
+import { TTokenData, TValidatorError } from "@/type";
+import { jwtDecode } from "jwt-decode";
+import { useAppDispatch } from "@/redux/hooks";
+import { setUser } from "@/redux/features/authSlice";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
-  const [userType, setUserType] = React.useState<"employee" | "admin">(
-    "employee",
-  );
-  const [loading, setLoading] = React.useState(false);
+  const router = useRouter();
+  const [login, { isLoading }] = useLoginMutation();
+  const dispatch = useAppDispatch();
 
   const form = useForm({
-    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
-      userType: "employee",
+      role: "ADMIN",
     },
   });
 
-  // sync userType with form
-  React.useEffect(() => {
-    form.setValue("userType", userType);
-  }, [userType, form]);
-
   const onSubmit = async (data: FieldValues) => {
     try {
-      setLoading(true);
-
-      // 👉 API call example
       console.log("Login data:", data);
 
-      // fake delay
-      await new Promise((res) => setTimeout(res, 1000));
-
+      const res = await login(data).unwrap();
+      const decodedData: TTokenData = jwtDecode(res?.data?.accessToken);
+      dispatch(setUser({ token: res?.data?.accessToken }));
+      if (decodedData?.role === "ADMIN") {
+        router.push("/admin");
+      } else {
+        router.push("/employee/projects");
+      }
       toast.success("Login successful 🚀");
-
-      // 👉 redirect / store token here
-    } catch (error) {
-      toast.error("Login failed ❌");
-    } finally {
-      setLoading(false);
+    } catch (error: any) {
+      if (error?.data?.message === "Validation Error") {
+        error?.data?.errorMessages?.map((validatorErr: TValidatorError) =>
+          form.setError(validatorErr?.path, { message: validatorErr.message }),
+        );
+      } else if (error?.status == 404 || error.status == 401) {
+        toast.error(error?.data?.message);
+      } else {
+        toast.error("Something went wrong. Please try again later.");
+      }
     }
   };
 
@@ -79,64 +80,56 @@ export default function LoginPage() {
         <FieldGroup className="space-y-5">
           {/* User Type */}
           <Tabs
-          
-            value={form.watch("userType")}
+            value={form.watch("role")}
             onValueChange={(value) =>
-              form.setValue("userType", value as "employee" | "admin")
+              form.setValue("role", value as "EMPLOYEE" | "ADMIN")
             }
           >
-            <TabsList className="grid w-full grid-cols-2" >
-              <TabsTrigger value="employee" >Employee</TabsTrigger>
-              <TabsTrigger value="admin">Admin</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="EMPLOYEE">Employee</TabsTrigger>
+              <TabsTrigger value="ADMIN">Admin</TabsTrigger>
             </TabsList>
           </Tabs>
-
 
           {/* Form */}
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             {/* Email */}
-            <Controller
-              name="email"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel>Email</FieldLabel>
-                  <Input
-                    {...field}
-                    type="email"
-                    placeholder="you@company.com"
-                    autoComplete="email"
-                  />
-                  {fieldState.error && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
+            <Field data-invalid={!!form.formState.errors.email}>
+              <FieldLabel>Email</FieldLabel>
+              <Input
+                type="email"
+                placeholder="you@company.com"
+                autoComplete="email"
+                {...form.register("email")}
+              />
+              {form.formState.errors.email && (
+                <FieldError errors={[form.formState.errors.email]} />
               )}
-            />
+            </Field>
 
             {/* Password */}
-            <Controller
-              name="password"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel>Password</FieldLabel>
-                  <Input
-                    {...field}
-                    type="password"
-                    placeholder="••••••••"
-                    autoComplete="current-password"
-                  />
-                  {fieldState.error && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
+            <Field data-invalid={!!form.formState.errors.password}>
+              <FieldLabel>Password</FieldLabel>
+              <Input
+                type="password"
+                placeholder="••••••••"
+                autoComplete="current-password"
+                {...form.register("password")}
+              />
+              {form.formState.errors.password && (
+                <FieldError errors={[form.formState.errors.password]} />
               )}
-            />
+            </Field>
 
             {/* Submit */}
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Signing in..." : "Sign In"}
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Spinner /> Signing in...
+                </>
+              ) : (
+                "Sign In"
+              )}
             </Button>
           </form>
         </FieldGroup>

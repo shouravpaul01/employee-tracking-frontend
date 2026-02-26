@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useForm } from "react-hook-form";
+import { FieldValues, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
@@ -33,31 +33,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { expensesCategory } from "@/constant";
+import { createExpenseSchema } from "@/validation/expenses.validation";
 
-const formSchema = z.object({
-  amount: z
-    .string()
-    .min(1, "Amount is required")
-    .refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0, {
-      message: "Amount must be a positive number",
-    }),
-  category: z.string().min(1, "Category is required"),
-  project: z.string().min(1, "Project is required"),
-  description: z.string().optional(),
-  receipt: z.any().optional(),
-});
 
-type FormValues = z.infer<typeof formSchema>;
 
-const categories = [
-  "Supplies",
-  "Travel",
-  "Meals",
-  "Equipment",
-  "Marketing",
-  "Utilities",
-  "Other",
-];
+
+
+
 
 const projects = [
   "Del Mar Coastal Villa",
@@ -84,10 +67,10 @@ export function CreateExpenseFormDialog({
     reset,
     setValue,
     watch,
-  } = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+  } = useForm({
+    resolver: zodResolver(createExpenseSchema),
     defaultValues: {
-      amount: "",
+      amount: 0,
       category: "",
       project: "",
       description: "",
@@ -97,7 +80,7 @@ export function CreateExpenseFormDialog({
   const selectedCategory = watch("category");
   const selectedProject = watch("project");
 
-  function onSubmit(data: FormValues) {
+  function onSubmit(data: FieldValues) {
     toast.success("Expense submitted!", {
       description: `$${data.amount} expense has been recorded.`,
     });
@@ -179,9 +162,9 @@ export function CreateExpenseFormDialog({
                     <SelectValue placeholder="Select Category" />
                   </SelectTrigger>
                   <SelectContent>
-                    {categories.map((category) => (
-                      <SelectItem key={category} value={category}>
-                        {category}
+                    {expensesCategory.map((category) => (
+                      <SelectItem key={category.label} value={category.label}>
+                        {category.label}
                       </SelectItem>
                     ))}
                   </SelectContent>

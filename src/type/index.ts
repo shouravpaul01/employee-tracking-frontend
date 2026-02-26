@@ -77,6 +77,7 @@ updatedAt: Date;
 
 expenses?: Expenses[];
 assignedEmployees?: AssignedEmployee[];
+todayAssignedEmployees?:number
 }
 
 // ================= ASSIGNED EMPLOYEE =================
@@ -142,4 +143,17 @@ sender?: User;
 
 isRead: boolean;
 createdAt: Date;
+}
+export type TValidatorError ={
+    path:any,
+    message:string
+}
+export type TTokenData ={
+  id: string;
+  name:string;
+  email: string;
+  role: string;
+  photo?: string;
+  phone?: string;
+ 
 }

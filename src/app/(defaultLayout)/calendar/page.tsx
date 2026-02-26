@@ -24,7 +24,7 @@ export default function Page() {
         <p className="text-base text-neutral-700 font-bold">
           {selectedDate ? format(selectedDate, "PPP") : "No date selected"}
         </p>
-        <ProjectCard i={1} />
+        {/* <ProjectCard i={1} /> */}
       </div>
     </div>
   );

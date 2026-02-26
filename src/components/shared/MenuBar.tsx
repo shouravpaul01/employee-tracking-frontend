@@ -1,43 +1,61 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Home, Calendar, Clock, Receipt, User } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import * as React from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { Home, Calendar, Clock, Receipt, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useAppSelector } from "@/redux/hooks";
+import { RootState } from "@/redux/store";
 
-const menuItems = [
-  { id: "project", label: "Project", icon: Home },
-  { id: "calendar", label: "Calendar", icon: Calendar },
-  { id: "timecards", label: "Timecards", icon: Clock },
-  { id: "expenses", label: "Expenses", icon: Receipt },
-  { id: "profile", label: "Profile", icon: User },
-]
+
+const menuConfig = {
+  ADMIN: [
+    { id: "projects", label: "Project", icon: Home, path: "/admin/projects" },
+    { id: "calendar", label: "Calendar", icon: Calendar, path: "/calendar" },
+    { id: "timecards", label: "Timecards", icon: Clock, path: "/admin/timecards" },
+    { id: "expenses", label: "Expenses", icon: Receipt, path: "/admin/expenses" },
+    { id: "profile", label: "Profile", icon: User, path: "/profile" },
+  ],
+  EMPLOYEE: [
+    { id: "projects", label: "Project", icon: Home, path: "/employee/projects" },
+    { id: "calendar", label: "Calendar", icon: Calendar, path: "/calendar" },
+    { id: "timecards", label: "Timecards", icon: Clock, path: "/employee/timecards" },
+    { id: "expenses", label: "Expenses", icon: Receipt, path: "/employee/expenses" },
+    { id: "profile", label: "Profile", icon: User, path: "/profile" },
+  ],
+};
 
 export function MenuBar() {
-  const [activeItem, setActiveItem] = React.useState("project")
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const { user } = useAppSelector((state: RootState) => state.auth);
+  const role = user?.role as "ADMIN" | "EMPLOYEE";
+
+  // fallback empty
+  const menuItems = role ? menuConfig[role] : [];
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background">
-      
-      {/* optional max width for centered layout */}
       <div className="max-w-md mx-auto flex justify-between px-2 py-2">
-        
         {menuItems.map((item) => {
-          const Icon = item.icon
-          const isActive = activeItem === item.id
+          const Icon = item.icon;
+
+          const isActive = pathname.startsWith(item.path);
 
           return (
             <Button
               key={item.id}
               variant="ghost"
-              onClick={() => setActiveItem(item.id)}
+              onClick={() => router.push(item.path)}
               className={`
                 flex flex-col items-center justify-center gap-1 flex-1 h-auto py-2
                 transition-all duration-200
-                ${isActive 
-                    ? "text-primary bg-primary/10 rounded-md" 
-                    : "hover:bg-primary/10 hover:rounded-md hover:text-primary "
-                  }
-                
+                ${
+                  isActive
+                    ? "text-primary bg-primary/10 rounded-md"
+                    : "hover:bg-primary/10 hover:rounded-md hover:text-primary"
+                }
               `}
             >
               <Icon
@@ -47,7 +65,6 @@ export function MenuBar() {
               />
               <span className="text-[11px]">{item.label}</span>
 
-              {/* active indicator */}
               <div
                 className={`
                   mt-1 h-1 w-6 rounded-full transition-all
@@ -55,10 +72,9 @@ export function MenuBar() {
                 `}
               />
             </Button>
-          )
+          );
         })}
-
       </div>
     </div>
-  )
+  );
 }
