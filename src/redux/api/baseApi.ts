@@ -17,7 +17,6 @@ const baseQuery = fetchBaseQuery({
       }
       return headers;
     },
-
   credentials: "include",
 });
 
