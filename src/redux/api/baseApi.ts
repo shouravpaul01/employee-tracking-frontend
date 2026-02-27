@@ -48,6 +48,6 @@ const baseQueryWithReauth: ReturnType<typeof fetchBaseQuery> = async (
 export const baseApi = createApi({
   reducerPath: "baseApi",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["User","Project","Analytics"],
+  tagTypes: ["User","Project","Analytics","AssignedEmployee","Expenses"],
   endpoints: (builder) => ({}),
 });

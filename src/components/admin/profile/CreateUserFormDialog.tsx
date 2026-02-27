@@ -1,36 +1,31 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { toast } from "sonner"
+import * as React from "react";
+import { FieldValues, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
   Field,
-  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { useRegisterUserMutation } from "@/redux/api/authApi";
+import { registerSchema } from "@/validation/auth.validation";
+import { TValidatorError } from "@/type";
 
-const formSchema = z.object({
-  userName: z.string().min(1, "User name is required"),
-  email: z.string().min(1, "Email is required").email("Please enter a valid email"),
-})
-
-type FormValues = z.infer<typeof formSchema>
+const DEFAULT_PASSWORD = "@12345678";
 
 export function CreateUserFormDialog({
   open,
@@ -39,75 +34,82 @@ export function CreateUserFormDialog({
   open: boolean;
   onOpenChange: (value: boolean) => void;
 }) {
+  const [registerUser, { isLoading }] = useRegisterUserMutation();
 
-  
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
     reset,
-  } = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+  } = useForm({
+    resolver: zodResolver(registerSchema),
     defaultValues: {
-      userName: "",
+      name: "",
       email: "",
+      password: DEFAULT_PASSWORD,
     },
-  })
+  });
 
-  function onSubmit(data: FormValues) {
-    toast.success("User created!", {
-      description: `${data.userName} has been added successfully.`,
-    })
-    
-    console.log("User data:", data)
-    onOpenChange(false)
-    reset()
-  }
+  const onSubmit = async (data: FieldValues) => {
+    try {
+      await registerUser(data).unwrap();
+
+      toast.success("User created!", {
+        description: `Default password: ${DEFAULT_PASSWORD}`,
+      });
+
+      onOpenChange(false);
+      reset();
+    } catch (error: any) {
+      console.log(error);
+      if (error?.data?.message === "Validation Error") {
+        error?.data?.errorMessages?.map((validatorErr: TValidatorError) =>
+          setError(validatorErr?.path, { message: validatorErr.message }),
+        );
+      } else {
+        toast.error("Failed to create user", {
+          description: error?.data?.message || "Something went wrong",
+        });
+      }
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-     
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Create User</DialogTitle>
-         
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)}>
-          <FieldGroup className=" py-4">
-            {/* User Name Field */}
+          <FieldGroup className="py-4 ">
+            {/* User Name */}
             <Field>
-              <FieldLabel htmlFor="userName" className="text-base">
-                User Name
-              </FieldLabel>
-            
+              <FieldLabel>User Name</FieldLabel>
               <Input
-                id="userName"
                 placeholder="Enter user name"
-                {...register("userName")}
-                className={errors.userName ? "border-red-500" : ""}
+                {...register("name")}
+                className={errors.name ? "border-red-500" : ""}
               />
-              {errors.userName && (
-                <FieldError errors={[errors.userName]} />
-              )}
+              {errors.name && <FieldError errors={[errors.name]} />}
             </Field>
 
-            {/* Email Field */}
+            {/* Email */}
             <Field>
-              <FieldLabel htmlFor="email" className="text-base">
-                Email
-              </FieldLabel>
-             
+              <FieldLabel>Email</FieldLabel>
               <Input
-                id="email"
                 type="email"
-                placeholder="Enter Email"
+                placeholder="Enter email"
                 {...register("email")}
                 className={errors.email ? "border-red-500" : ""}
               />
-              {errors.email && (
-                <FieldError errors={[errors.email]} />
-              )}
+              {errors.email && <FieldError errors={[errors.email]} />}
+            </Field>
+
+            <Field>
+              <FieldLabel>Password</FieldLabel>
+              <Input type="text" value={DEFAULT_PASSWORD} disabled />
             </Field>
           </FieldGroup>
 
@@ -116,18 +118,20 @@ export function CreateUserFormDialog({
               type="button"
               variant="outline"
               onClick={() => {
-                reset()
-                onOpenChange(false)
+                reset();
+                onOpenChange(false);
               }}
+              disabled={isLoading}
             >
               Cancel
             </Button>
-            <Button type="submit">
-              Create User
+
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? "Creating..." : "Create User"}
             </Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

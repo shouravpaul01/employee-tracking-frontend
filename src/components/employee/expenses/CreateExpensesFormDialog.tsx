@@ -1,9 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { FieldValues, useForm } from "react-hook-form";
+import { useForm, Controller, FieldValues } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { toast } from "sonner";
 import { Upload, X } from "lucide-react";
 
@@ -15,11 +14,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Field,
-  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
@@ -35,20 +32,10 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { expensesCategory } from "@/constant";
 import { createExpenseSchema } from "@/validation/expenses.validation";
-
-
-
-
-
-
-
-const projects = [
-  "Del Mar Coastal Villa",
-  "Downtown Office Renovation",
-  "Beachfront Property",
-  "Hillside Residence",
-  "Commercial Space Staging",
-];
+import { useGetAllProjectsQuery } from "@/redux/api/projectApi";
+import { useCreateExpenseMutation } from "@/redux/api/expensesApi";
+import { Spinner } from "@/components/ui/spinner";
+import { TValidatorError } from "@/type";
 
 export function CreateExpenseFormDialog({
   open,
@@ -59,57 +46,78 @@ export function CreateExpenseFormDialog({
 }) {
   const [receiptFile, setReceiptFile] = React.useState<File | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [createExpense, { isLoading: isCreateLoading }] =
+    useCreateExpenseMutation();
+  const { data, isLoading } = useGetAllProjectsQuery({ limit: 500 });
+  const projects = data?.data ?? [];
 
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
+    setError,
+    clearErrors,
     reset,
-    setValue,
-    watch,
   } = useForm({
     resolver: zodResolver(createExpenseSchema),
     defaultValues: {
-      amount: 0,
+      amount: undefined,
       category: "",
-      project: "",
+      projectId: "",
       description: "",
     },
   });
 
-  const selectedCategory = watch("category");
-  const selectedProject = watch("project");
-
-  function onSubmit(data: FieldValues) {
-    toast.success("Expense submitted!", {
-      description: `$${data.amount} expense has been recorded.`,
-    });
-
-    console.log("Expense data:", data);
-    console.log("Receipt:", receiptFile);
-
-    onOpenChange(false);
-    reset();
-    setReceiptFile(null);
-  }
-
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setReceiptFile(file);
-    }
+    if (file) setReceiptFile(file);
+    clearErrors("receiptDocImage")
   };
 
   const removeReceipt = () => {
     setReceiptFile(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const onSubmit = async (data: FieldValues) => {
+    try {
+      // FormData for file upload
+      const formData = new FormData();
+
+      if (!receiptFile) {
+        setError("receiptDocImage", { message: "File is required." });
+        return
+      }
+      formData.append("receiptDocImage", receiptFile);
+      formData.append("bodyData", JSON.stringify(data));
+      await createExpense(formData).unwrap();
+
+      toast.success("Expense submitted!", {
+        description: `$${data.amount} expense has been recorded.`,
+      });
+
+      onOpenChange(false);
+      reset();
+      setReceiptFile(null);
+    } catch (error: any) {
+      if (error?.data?.message === "Validation Error") {
+        error?.data?.errorMessages?.map((validatorErr: TValidatorError) =>
+          setError(validatorErr?.path, {
+            message: validatorErr.message,
+          }),
+        );
+      } else {
+        toast.error("Failed to submit expense");
+      }
+
+      console.error(error);
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] p-0 gap-0">
+      <DialogContent className="sm:max-w-[500px] p-0">
         <DialogHeader className="px-6 py-4 border-b">
           <DialogTitle className="text-2xl font-bold">Add Expense</DialogTitle>
           <DialogDescription>
@@ -138,79 +146,87 @@ export function CreateExpenseFormDialog({
                     step="0.01"
                     placeholder="0.00"
                     className={`pl-7 ${errors.amount ? "border-red-500" : ""}`}
-                    {...register("amount")}
+                    {...register("amount", { valueAsNumber: true })}
                   />
                 </div>
                 {errors.amount && <FieldError errors={[errors.amount]} />}
               </Field>
 
               {/* Category */}
-              <Field>
-                <FieldLabel
-                  htmlFor="category"
-                  className="text-base font-semibold"
-                >
-                  Category
-                </FieldLabel>
-                <Select
-                  onValueChange={(value) => setValue("category", value)}
-                  value={selectedCategory}
-                >
-                  <SelectTrigger
-                    className={errors.category ? "border-red-500" : ""}
-                  >
-                    <SelectValue placeholder="Select Category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {expensesCategory.map((category) => (
-                      <SelectItem key={category.label} value={category.label}>
-                        {category.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.category && <FieldError errors={[errors.category]} />}
-              </Field>
+              <Controller
+                control={control}
+                name="category"
+                render={({ field }) => (
+                  <Field>
+                    <FieldLabel className="text-base font-semibold">
+                      Category
+                    </FieldLabel>
+                    <Select
+                      {...field}
+                      onValueChange={field.onChange}
+                      value={field.value}
+                    >
+                      <SelectTrigger
+                        className={errors.category ? "border-red-500" : ""}
+                      >
+                        <SelectValue placeholder="Select Category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {expensesCategory.map((cat) => (
+                          <SelectItem key={cat.value} value={cat.value}>
+                            {cat.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {errors.category && (
+                      <FieldError errors={[errors.category]} />
+                    )}
+                  </Field>
+                )}
+              />
 
               {/* Project */}
-              <Field>
-                <FieldLabel
-                  htmlFor="project"
-                  className="text-base font-semibold"
-                >
-                  Project
-                </FieldLabel>
-                <Select
-                  onValueChange={(value) => setValue("project", value)}
-                  value={selectedProject}
-                >
-                  <SelectTrigger
-                    className={errors.project ? "border-red-500" : ""}
-                  >
-                    <SelectValue placeholder="Select Project" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {projects.map((project) => (
-                      <SelectItem key={project} value={project}>
-                        {project}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.project && <FieldError errors={[errors.project]} />}
-              </Field>
+              <Controller
+                control={control}
+                name="projectId"
+                render={({ field }) => (
+                  <Field>
+                    <FieldLabel className="text-base font-semibold">
+                      Project
+                    </FieldLabel>
+                    <Select
+                      {...field}
+                      onValueChange={field.onChange}
+                      value={field.value}
+                    >
+                      <SelectTrigger
+                        className={errors.projectId ? "border-red-500" : ""}
+                      >
+                        <SelectValue placeholder="Select Project" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {projects.map((project: any) => (
+                          <SelectItem key={project.id} value={project.id}>
+                            {project.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {errors.projectId && (
+                      <FieldError errors={[errors.projectId]} />
+                    )}
+                  </Field>
+                )}
+              />
 
               {/* Description */}
               <Field>
-                <FieldLabel
-                  htmlFor="description"
-                  className="text-base font-semibold"
-                >
+                <FieldLabel className="text-base font-semibold">
                   Description (Optional)
                 </FieldLabel>
                 <Textarea
-                  id="description"
-                  placeholder="Add details about this expenses.."
+                  placeholder="Add details about this expense.."
                   className="min-h-[80px]"
                   {...register("description")}
                 />
@@ -218,10 +234,7 @@ export function CreateExpenseFormDialog({
 
               {/* Receipt Upload */}
               <Field>
-                <FieldLabel
-                  htmlFor="receipt"
-                  className="text-base font-semibold"
-                >
+                <FieldLabel className="text-base font-semibold">
                   Receipt
                 </FieldLabel>
 
@@ -268,10 +281,14 @@ export function CreateExpenseFormDialog({
                     </Button>
                   </div>
                 )}
+                {errors?.receiptDocImage && (
+                  <FieldError errors={[errors.receiptDocImage]} />
+                )}
               </Field>
             </FieldGroup>
           </div>
-          <DialogFooter className="px-6 py-4 border-t flex gap-2 ">
+
+          <DialogFooter className="px-6 py-4 border-t flex gap-2">
             <Button
               type="button"
               variant="destructive"
@@ -285,7 +302,13 @@ export function CreateExpenseFormDialog({
               Cancel
             </Button>
             <Button type="submit" className="flex-1">
-              Submit
+              {isCreateLoading ? (
+                <>
+                  <Spinner /> Submitting...
+                </>
+              ) : (
+                "Submit"
+              )}
             </Button>
           </DialogFooter>
         </form>

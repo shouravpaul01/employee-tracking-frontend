@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { FieldValues, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,7 +14,6 @@ import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import logo from "../../../../public/logo.png";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { loginSchema } from "@/validation/auth.validation";
 import { useLoginMutation } from "@/redux/api/authApi";
 import { Spinner } from "@/components/ui/spinner";
 import { TTokenData, TValidatorError } from "@/type";
@@ -23,11 +21,15 @@ import { jwtDecode } from "jwt-decode";
 import { useAppDispatch } from "@/redux/hooks";
 import { setUser } from "@/redux/features/authSlice";
 import { useRouter } from "next/navigation";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
   const [login, { isLoading }] = useLoginMutation();
   const dispatch = useAppDispatch();
+
+  // 👁 password toggle state
+  const [showPassword, setShowPassword] = React.useState(false);
 
   const form = useForm({
     defaultValues: {
@@ -39,21 +41,25 @@ export default function LoginPage() {
 
   const onSubmit = async (data: FieldValues) => {
     try {
-      console.log("Login data:", data);
-
       const res = await login(data).unwrap();
+
       const decodedData: TTokenData = jwtDecode(res?.data?.accessToken);
+
       dispatch(setUser({ token: res?.data?.accessToken }));
+
       if (decodedData?.role === "ADMIN") {
         router.push("/admin");
       } else {
         router.push("/employee/projects");
       }
+
       toast.success("Login successful 🚀");
     } catch (error: any) {
       if (error?.data?.message === "Validation Error") {
         error?.data?.errorMessages?.map((validatorErr: TValidatorError) =>
-          form.setError(validatorErr?.path, { message: validatorErr.message }),
+          form.setError(validatorErr?.path, {
+            message: validatorErr.message,
+          })
         );
       } else if (error?.status == 404 || error.status == 401) {
         toast.error(error?.data?.message);
@@ -78,7 +84,7 @@ export default function LoginPage() {
         </div>
 
         <FieldGroup className="space-y-5">
-          {/* User Type */}
+          {/* Role Tabs */}
           <Tabs
             value={form.watch("role")}
             onValueChange={(value) =>
@@ -107,15 +113,34 @@ export default function LoginPage() {
               )}
             </Field>
 
-            {/* Password */}
+            {/* Password with Toggle 👁 */}
             <Field data-invalid={!!form.formState.errors.password}>
               <FieldLabel>Password</FieldLabel>
-              <Input
-                type="password"
-                placeholder="••••••••"
-                autoComplete="current-password"
-                {...form.register("password")}
-              />
+
+              <div className="relative">
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  autoComplete="current-password"
+                  {...form.register("password")}
+                  className="pr-10"
+                />
+
+                <Button
+                variant={"ghost"}
+                size={"icon-sm"}
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-primary transition"
+                >
+                  {showPassword ? (
+                    <EyeOff className="size-5" />
+                  ) : (
+                    <Eye className="size-5" />
+                  )}
+                </Button>
+              </div>
+
               {form.formState.errors.password && (
                 <FieldError errors={[form.formState.errors.password]} />
               )}

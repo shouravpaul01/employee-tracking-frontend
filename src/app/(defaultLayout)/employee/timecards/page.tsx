@@ -12,9 +12,14 @@ import {
 } from "@/components/ui/select";
 import React, { useEffect, useState } from "react";
 import { Coffee, Play, Square } from "lucide-react";
+import { useGetAssignedProjectsQuery } from "@/redux/api/assingedEmployeeApi";
+import { Project } from "@/type";
+import { format } from "date-fns";
 
 export default function Page() {
   const [now, setNow] = useState(new Date());
+  const {data,isLoading:isAssignedLoading}=useGetAssignedProjectsQuery({date:format(new Date(), "yyyy-MM-dd"),limit:50})
+  const projects=data?.data
 
   // ⏰ live clock
   useEffect(() => {
@@ -52,12 +57,14 @@ export default function Page() {
             {/* Select */}
             <Select>
               <SelectTrigger className=" w-full">
-                <SelectValue placeholder="Select a Project" />
+                <SelectValue placeholder={projects?.length>0?"Select a Project":"No assigned projects."} />
               </SelectTrigger>
 
               <SelectContent className="w-full">
-                <SelectItem value="project1">Del Mar Coastal Villa</SelectItem>
-                <SelectItem value="project2">Downtown Office</SelectItem>
+                {projects?.map((project:Project)=><SelectItem key={project?.id} value={project?.id}>{project?.name}</SelectItem>)}
+
+               
+          
               </SelectContent>
             </Select>
 

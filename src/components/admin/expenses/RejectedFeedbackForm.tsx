@@ -23,17 +23,21 @@ import {
 } from "@/components/ui/field";
 import { Textarea } from "@/components/ui/textarea";
 import { rejectedFeedbackSchema } from "@/validation/expenses.validation";
-
-
-
+import { ExpensesStatus } from "@/type";
+import { useUpdateExpenseStatusMutation } from "@/redux/api/expensesApi";
 
 export function RejectedFeedbackForm({
+  id,
+  status,
   openDialog,
   onOpenDialogChange,
 }: {
+  id: string;
+  status: ExpensesStatus;
   openDialog: boolean;
   onOpenDialogChange: (value: boolean) => void;
 }) {
+  const [updateExpenseStatus, { isLoading }] = useUpdateExpenseStatusMutation();
   const {
     register,
     handleSubmit,
@@ -46,12 +50,27 @@ export function RejectedFeedbackForm({
     },
   });
 
-  function onSubmit(data: FieldValues) {
-    toast.success("Feedback sent!");
-    console.log("Feedback:", data);
-    onOpenDialogChange(false);
-    reset();
-  }
+  const onSubmit = async (data: FieldValues) => {
+    console.log({
+        id,
+        status,
+        feedback: data.feedback,
+      })
+    try {
+      await updateExpenseStatus({
+        id,
+        status,
+        feedback: data.feedback,
+      }).unwrap();
+
+      toast.success("Rejected with feedback");
+      onOpenDialogChange(false);
+      reset();
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to submit feedback");
+    }
+  };
 
   return (
     <Dialog open={openDialog} onOpenChange={onOpenDialogChange}>
@@ -75,7 +94,9 @@ export function RejectedFeedbackForm({
           </FieldGroup>
 
           <DialogFooter>
-            <Button type="submit" className="w-full">Send</Button>
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Sending..." : "Send"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

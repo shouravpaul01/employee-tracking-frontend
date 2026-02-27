@@ -10,7 +10,26 @@ export const projectApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Project"],
     }),
+    getAllProjects: builder.query({
+      query: (args) => {
+        const params = new URLSearchParams();
 
+        if (args) {
+          Object.entries(args).forEach(([key, value]) => {
+            if (value !== undefined && value !== null && value !== "") {
+              params.append(key, value.toString());
+            }
+          });
+        }
+
+        return {
+          url: "/projects",
+          method: "GET",
+          params,
+        };
+      },
+      providesTags: ["Project"],
+    }),
     // Infinite query version with filters
     getAllProjectsInfinite: builder.infiniteQuery({
       query({ pageParam = 1, queryArg }) {
@@ -70,6 +89,7 @@ export const projectApi = baseApi.injectEndpoints({
 
 export const {
   useCreateProjectMutation,
+  useGetAllProjectsQuery,
   useGetAllProjectsInfiniteInfiniteQuery,
   useGetSingleProjectQuery,
   useUpdateProjectMutation,

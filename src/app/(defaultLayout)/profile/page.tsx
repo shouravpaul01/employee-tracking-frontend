@@ -11,10 +11,16 @@ import { useAppDispatch } from "@/redux/hooks";
 import { logout } from "@/redux/features/authSlice";
 import { useRouter } from "next/navigation";
 
+import { useGetMeQuery } from "@/redux/api/userApi";
+import Loading from "@/components/shared/Loading";
+
 export default function page() {
-  const [logoutApi, { isLoading }] = useLogoutApiMutation();
+  const [logoutApi] = useLogoutApiMutation();
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const {data,isLoading:isGetMeLoading}=useGetMeQuery(undefined)
+  const user=data?.data?.user
+  const summery=data?.data?.summery
   const handleLogout = async () => {
     try {
       await logoutApi(undefined).unwrap();
@@ -26,15 +32,19 @@ export default function page() {
       toast.error("Something went wrong. Please try again later.");
     }
   };
+
+  if (isGetMeLoading) {
+    return <Loading />
+  }
   return (
     <div>
       <Header title="Profile" />
       <div className="container space-y-4">
-        <UserProfileCard isHideRoleBadge={true} />
+        <UserProfileCard data={user}  />
         <div className="grid grid-cols-3 gap-2.5">
-          <StateCount count={`50`} title="Projects" />
-          <StateCount count={`50`} title="This Month" />
-          <StateCount count={`50`} title="Expenses" />
+          <StateCount count={summery?.totalProjects || 0} title="Projects" />
+          <StateCount count={`${summery?.totalEmployeeMonthlyHours || 0}h`} title="This Month" />
+          <StateCount count={`$${summery?.totalApprovedExpenses}`} title="Expenses" />
         </div>
         <MenuQuickActions />
         <Button

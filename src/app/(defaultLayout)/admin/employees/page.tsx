@@ -1,29 +1,77 @@
+"use client";
+
 import Header from "@/components/shared/Header";
 import { UserProfileCard } from "@/components/shared/UserProfileCard";
 import {
   Table,
   TableBody,
- 
   TableCell,
- 
   TableRow,
 } from "@/components/ui/table";
+import { useGetAllUsersInfiniteQuery } from "@/redux/api/userApi";
 
-export default function page() {
+import { useEffect, useRef } from "react";
+
+export default function Page() {
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+  } = useGetAllUsersInfiniteQuery({ limit: 30 });
+
+  // Flatten pages
+  const users =
+    data?.pages?.flatMap((page) => page?.data || []) || [];
+
+  // Intersection Observer (auto load)
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!loadMoreRef.current) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && hasNextPage) {
+        fetchNextPage();
+      }
+    });
+
+    observer.observe(loadMoreRef.current);
+
+    return () => observer.disconnect();
+  }, [hasNextPage, fetchNextPage]);
+
   return (
     <div>
       <Header title="Employees" backHref="/profile" />
+
       <div className="container space-y-4">
-        <div className="border rounded-lg overflow-hidden">
+        <div className="border rounded-lg ">
           <Table>
             <TableBody>
-              {[1, 2].map((item) => (
-                <TableRow key={item} className="hover:bg-transparent">
+              {users.map((user: any) => (
+                <TableRow key={user.id} className="hover:bg-transparent">
                   <TableCell className="p-4">
-                    <UserProfileCard wrapperClassName="p-0! border-none" />
+                    <UserProfileCard
+                      data={user}
+                      wrapperClassName="p-0! border-none"
+                      isHideRoleBadge
+                    />
                   </TableCell>
                 </TableRow>
               ))}
+
+              {/* Loader */}
+              {isLoading && (
+                <TableRow>
+                  <TableCell className="p-4 text-center">
+                    Loading...
+                  </TableCell>
+                </TableRow>
+              )}
+
+            
             </TableBody>
           </Table>
         </div>

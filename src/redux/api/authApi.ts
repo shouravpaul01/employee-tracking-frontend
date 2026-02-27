@@ -10,9 +10,9 @@ export const authApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["User"],
     }),
-    register: builder.mutation({
+    registerUser: builder.mutation({
       query: (credentials) => ({
-        url: "/users/register",
+        url: "/auth/register",
         method: "POST",
         body: credentials,
       }),
@@ -62,13 +62,7 @@ export const authApi = baseApi.injectEndpoints({
         body: data,
       }),
     }),
-    getMe: builder.query({
-      query: () => ({
-        url: "/users/me",
-        method: "GET",
-      }),
-      providesTags: ["User"],
-    }),
+   
     updateUser: builder.mutation({
       query: (data) => ({
         url: "/users/profile",
@@ -90,14 +84,14 @@ export const authApi = baseApi.injectEndpoints({
 
 export const {
   useLoginMutation,
-  useRegisterMutation,
+  useRegisterUserMutation,
   useSocialAuthMutation,
   useForgotPasswordMutation,
   useResendOtpMutation,
   useVerifyOtpMutation,
   useResetPasswordMutation,
   useChangePasswordMutation,
-  useGetMeQuery,
+
   useUpdateUserMutation,
   useLogoutApiMutation
 } = authApi;

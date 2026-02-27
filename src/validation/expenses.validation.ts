@@ -6,11 +6,12 @@ export const rejectedFeedbackSchema = z.object({
 
 export const createExpenseSchema = z.object({
   amount: z
-    .number()
+    .number({error:"Amount is required."})
     .min(1, "Amount is required"),
     
   category: z.string().nonempty( "Category is required"),
-  project: z.string().nonempty("Project is required"),
+  projectId: z.string().nonempty("Project is required"),
   description: z.string().optional(),
-  receipt: z.any().optional(),
+ 
+   receiptDocImage:z.any().optional(),
 });

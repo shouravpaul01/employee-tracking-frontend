@@ -1,61 +1,47 @@
-import { ReactNode } from "react";
+"use client";
+
 import { Badge } from "@/components/ui/badge";
+import { expensesCategory, statusColors } from "@/constant";
+import { cn } from "@/lib/utils";
+import { Expenses } from "@/type";
+import { formatStatus } from "@/utils/formatStatus";
 
-type ExpenseCardProps = {
-  icon: ReactNode;
-  title: string;
-  address?: string;
-  description?: string;
-  amount: number | string;
-  status: "Approved" | "Pending" | "Rejected";
-  note?: string;
-};
+export const ExpenseCard = ({ data }: { data: Expenses }) => {
+  const { category, status, description, amount, employee, project, feedback } = data;
 
-export const ExpenseCard = ({
-  icon,
-  title,
-  address,
-  description,
-  amount,
-  status,
-  note,
-}: ExpenseCardProps) => {
+  // Find icon component
+  const categoryObj = expensesCategory.find((cat) => cat.value === category);
+  const IconComponent = categoryObj?.icon;
+
   return (
-    <div className="bg-white border rounded-lg p-3 ">
+    <div className="bg-white border rounded-lg p-3">
+      <div className="flex gap-3 items-start">
+        {/* Icon */}
+        <div className="bg-gray-100 rounded-lg p-3 flex items-center justify-center">
+          {IconComponent && <IconComponent className="size-6 text-gray-600" />}
+        </div>
 
-    <div className="flex gap-3 items-start">
-          <div className="bg-gray-100 rounded-lg p-3">{icon}</div>
+        {/* Details */}
+        <div className="flex-1">
+          <h6 className="text-lg text-neutral-700 font-semibold">{ category}</h6>
 
+          {project && <p className="text-neutral-500 text-sm mb-1">{project.name}</p>}
+          {description && <p className="text-neutral-500 text-sm mt-2">{description}</p>}
+        </div>
 
-      <div className="flex-1">
-        <h6 className="text-lg text-neutral-700 font-semibold">{title}</h6>
-
-        {address && (
-          <p className="text-neutral-500 text-sm mb-1">{address}</p>
-        )}
-
-        {description && (
-          <p className="text-neutral-500 text-sm mt-2">{description}</p>
-        )}
+        {/* Amount + Status */}
+        <div className="text-right space-y-2">
+          <h6 className="text-lg font-semibold">${amount.toFixed(2)}</h6>
+          <Badge variant="outline" className={cn("py-1 px-2", statusColors[status])}>
+            {formatStatus(status)}
+          </Badge>
+        </div>
       </div>
 
-     
-      <div className="text-right space-y-2">
-        <h6 className="text-lg font-semibold">${amount}</h6>
-
-        <Badge
-          variant="outline"
-          className="bg-primary/10 border border-primary text-primary py-1 px-2"
-        >
-          {status}
-        </Badge>
-      </div>
-    </div>
-
-     
-      {note && (
+      {/* Feedback */}
+      {feedback && (
         <div className="w-full inline-flex items-center bg-red-100 text-red-500 text-sm px-2 py-1 rounded mt-3">
-          {note}
+          {feedback}
         </div>
       )}
     </div>
