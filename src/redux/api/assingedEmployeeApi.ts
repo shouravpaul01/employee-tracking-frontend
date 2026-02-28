@@ -9,7 +9,7 @@ export const assignedEmployeeApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["AssignedEmployee"],
+      invalidatesTags: ["AssignedEmployee","Project"],
     }),
 
     // Update check-in/out or break times

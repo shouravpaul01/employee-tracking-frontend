@@ -2,9 +2,28 @@ import { baseApi } from "@/redux/api/baseApi";
 
 export const userApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    
+    getAllUsers: builder.query({
+      query: (args) => {
+        const params = new URLSearchParams();
+
+        if (args) {
+          Object.entries(args).forEach(([key, value]) => {
+            if (value !== undefined && value !== null && value !== "") {
+              params.append(key, value as string);
+            }
+          });
+        }
+
+        return {
+          url: "/users",
+          method: "GET",
+          params,
+        };
+      },
+      providesTags: ["User"], 
+    }),
     // Infinite query for all expenses (ADMIN)
-    getAllUsers: builder.infiniteQuery({
+    getAllUsersInfinite: builder.infiniteQuery({
       query({ pageParam = 1, queryArg }) {
         return {
           url: "/users",
@@ -40,4 +59,4 @@ export const userApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useGetAllUsersInfiniteQuery,useGetMeQuery } = userApi;
+export const {useGetAllUsersQuery, useGetAllUsersInfiniteInfiniteQuery, useGetMeQuery } = userApi;

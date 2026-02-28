@@ -54,3 +54,8 @@ export const statusColors = {
   APPROVED: "bg-green-100 text-green-800 border-green-400",
   REJECTED:"bg-red-100 text-red-600 border-red-300"
 };
+
+export const assignedEmployeeRoles=[
+  "RUNNER",
+  "PICKER"
+]

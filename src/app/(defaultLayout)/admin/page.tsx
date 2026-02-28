@@ -27,8 +27,10 @@ import Loading from "@/components/shared/Loading";
 import { statusColors } from "@/constant";
 import { formatStatus } from "@/utils/formatStatus";
 import { ProjectStatus } from "@/type";
+import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
+  const router=useRouter()
   const { data, isLoading, isError } = useGetAdminOverviewQuery(undefined);
   if (isLoading) {
     return <Loading />;
@@ -83,6 +85,7 @@ export default function DashboardPage() {
                         variant="ghost"
                         size="sm"
                         className="text-primary hover:text-primary"
+                        onClick={()=>router.push("/admin/projects")}
                       >
                         View All <ChevronRight />
                       </Button>
@@ -129,6 +132,7 @@ export default function DashboardPage() {
                         variant="ghost"
                         size="sm"
                         className="text-primary hover:text-primary"
+                         onClick={()=>router.push("/admin/expenses")}
                       >
                         View All <ChevronRight />
                       </Button>
