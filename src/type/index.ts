@@ -1,3 +1,4 @@
+// src\type\index.ts
 export type UserRole = "ADMIN" | "EMPLOYEE";
 
 export type UserStatus = "ACTIVE" | "BLOCKED";
@@ -160,3 +161,55 @@ export type TTokenData = {
   photo?: string;
   phone?: string;
 };
+
+
+// types/quote.ts
+export interface Room {
+  id: string;
+  label: string;
+  subItems: string[];
+}
+
+export interface SelectedRoom {
+  name: string;
+  items: string[];
+}
+
+export interface QuoteData {
+  quoteNumber: string;
+  quoteDate: string;
+  clientId: string;
+  clientName: string;
+  clientAddress: string;
+  clientEmail: string;
+  clientPhone: string;
+  packageName: string;
+  rooms: SelectedRoom[];
+  estimatedTotal: number;
+  discountPercent: number;
+  totalAmount: number;
+}
+
+export interface FormErrors {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  selectedRooms?: string;
+  selectedPackage?: string;
+  estimatedTotal?: string;
+  discountPercent?: string;
+}
+
+export interface QuoteFormValues {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address: string;
+  selectedRooms: string[];
+  selectedPackage: string;
+  estimatedTotal: string;
+  discountPercent: string;
+}

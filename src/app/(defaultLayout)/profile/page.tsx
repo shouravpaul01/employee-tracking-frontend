@@ -1,3 +1,4 @@
+// src\app\(defaultLayout)\profile\page.tsx
 "use client";
 import { UserProfileCard } from "@/components/shared/UserProfileCard";
 import Header from "@/components/shared/Header";

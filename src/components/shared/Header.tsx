@@ -1,3 +1,4 @@
+// src\components\shared\Header.tsx
 import React, { ReactNode } from "react";
 import { Button } from "../ui/button";
 import { ChevronLeft } from "lucide-react";
@@ -15,27 +16,26 @@ export default function Header({
   rightContent?: ReactNode;
 }) {
   return (
-    <div className="container flex border-b items-center py-2">
+    <div className="container flex border-b items-center py-2 justify-between">
       <div className="flex-1">
-<div className=" flex items-center gap-2">
-        {backHref && (
-          <Button
-            asChild
-            variant={"ghost"}
-            size={"icon-sm"}
-            className="rounded-full text-neutral-700"
-          >
-            <Link href={backHref}>
-              <ChevronLeft className="size-6" />
-            </Link>
-          </Button>
-        )}
-        <h1 className=" text-lg font-semibold text-neutral-700">{title}</h1>
-        
+        <div className=" flex items-center gap-2">
+          {backHref && (
+            <Button
+              asChild
+              variant={"ghost"}
+              size={"icon-sm"}
+              className="rounded-full text-neutral-700"
+            >
+              <Link href={backHref}>
+                <ChevronLeft className="size-6" />
+              </Link>
+            </Button>
+          )}
+          <h1 className=" text-lg font-semibold text-neutral-700">{title}</h1>
+        </div>
+        {subTitle && <p className="text-neutral-500">{subTitle}</p>}
       </div>
-      {subTitle && <p className="text-neutral-500">{subTitle}</p>}
-      </div>
-      
+
       {rightContent}
     </div>
   );

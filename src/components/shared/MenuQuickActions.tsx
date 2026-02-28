@@ -1,3 +1,4 @@
+// src\components\shared\MenuQuickActions.tsx
 "use client"
 import { ChevronRight, FileText, UserPlus, Bell, Users } from "lucide-react"
 import { CreateUserFormDialog } from "../admin/profile/CreateUserFormDialog"
@@ -18,14 +19,14 @@ export function MenuQuickActions() {
     {
       title: "Generate Quote",
       icon: FileText,
-      onClick: () => {},
+      onClick: () => router.push("/admin/generate-quote"), // ← updated
       roles: ["ADMIN"],
     },
     {
       title: "Create User",
       icon: UserPlus,
       onClick: () => setOpenDialog(true),
-      roles: ["ADMIN"], 
+      roles: ["ADMIN"],
     },
     {
       title: "Notifications",
@@ -37,7 +38,7 @@ export function MenuQuickActions() {
       title: "Employee List",
       icon: Users,
       onClick: () => router.push("/admin/employees"),
-      roles: ["ADMIN"], 
+      roles: ["ADMIN"],
     },
   ]
 
@@ -61,7 +62,6 @@ export function MenuQuickActions() {
                   {action.title}
                 </span>
               </div>
-
               <ChevronRight className="text-gray-400 group-hover:text-primary transition" />
             </div>
           </div>
