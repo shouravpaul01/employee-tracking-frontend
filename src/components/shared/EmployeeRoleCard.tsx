@@ -42,7 +42,7 @@ export default function EmployeeRoleCard({ employee }: EmployeeRoleCardProps) {
         data: { role: value },
       }).unwrap();
       toast.success("Role updated successfully");
-    } catch (error) {
+    } catch (error:any) {
       toast.error("Failed to update role");
     }
   };
