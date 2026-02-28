@@ -9,15 +9,15 @@ export const assignedEmployeeApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["AssignedEmployee","Project"],
+      invalidatesTags: ["AssignedEmployee", "Project"],
     }),
 
     // Update check-in/out or break times
     updateAttendanceTime: builder.mutation({
-      query: ({ id, data }) => ({
-        url: `/assigned-employee/update-attendance-time/${id}`,
+      query: ({ id, status }) => ({
+        url: `/assigned-employee/update-attendance-time/${id}?status=${status}`,
         method: "PATCH",
-        body: data,
+      
       }),
       invalidatesTags: ["AssignedEmployee"],
     }),
@@ -75,6 +75,13 @@ export const assignedEmployeeApi = baseApi.injectEndpoints({
       },
       providesTags: ["AssignedEmployee"],
     }),
+    getSingleAssignedProject: builder.query({
+      query: (id: string) => ({
+        url: `/assigned-employee/single-assigned-employee/${id}`,
+        method: "GET",
+      }),
+      providesTags: ["AssignedEmployee"],
+    }),
     getRecentEntries: builder.query({
       query: (args) => {
         const params = new URLSearchParams();
@@ -95,6 +102,14 @@ export const assignedEmployeeApi = baseApi.injectEndpoints({
       },
       providesTags: ["AssignedEmployee"],
     }),
+    updateAssignedEmployeeRole: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/assigned-employee/${id}/role`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["AssignedEmployee"],
+    }),
   }),
 });
 
@@ -103,4 +118,7 @@ export const {
   useUpdateAttendanceTimeMutation,
   useGetAssignedProjectsInfiniteInfiniteQuery,
   useGetAssignedProjectsQuery,
+  useUpdateAssignedEmployeeRoleMutation,
+  useGetRecentEntriesQuery,
+  useGetSingleAssignedProjectQuery
 } = assignedEmployeeApi;

@@ -26,10 +26,13 @@ import {
   AvatarImage,
 } from "@/components/ui/avatar";
 import { AssignEmployeeFormDialog } from "@/components/admin/assignedEmployee/AssignEmpolyeeFormDialog";
+import { Badge } from "@/components/ui/badge";
+import UpdateRoleSelect from "@/components/shared/UpdateRoleSelect";
+import EmployeeRoleCard from "@/components/shared/EmployeeRoleCard";
 
 export default function page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  
+
   const [tab, setTab] = useState("Overview");
   const [openDialog, setOpenDialog] = useState(false);
   const { data, isLoading } = useGetSingleProjectQuery(id, { skip: !id });
@@ -39,104 +42,112 @@ export default function page({ params }: { params: Promise<{ id: string }> }) {
     return <Loading />;
   }
   return (
-   <>
-    <div>
-      <Header title="Project Details" backHref="/admin/projects" />
-      <div className="container space-y-4">
-        <ProjectCard data={project} />
-        <Tabs value={tab} onValueChange={(value) => setTab(value)}>
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="Overview">Overview</TabsTrigger>
-            <TabsTrigger value="Media">Media</TabsTrigger>
-            <TabsTrigger value="Team">Team</TabsTrigger>
-          </TabsList>
-        </Tabs>
+    <>
+      <div>
+        <Header title="Project Details" backHref="/admin/projects" />
+        <div className="container space-y-4">
+          <ProjectCard data={project} />
+          <Tabs value={tab} onValueChange={(value) => setTab(value)}>
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="Overview">Overview</TabsTrigger>
+              <TabsTrigger value="Media">Media</TabsTrigger>
+              <TabsTrigger value="Team">Team</TabsTrigger>
+            </TabsList>
+          </Tabs>
 
-        {tab == "Overview" && (
-          <>
-            {project?.accessInfo && (
-              <InfoCard
-                title="Access Information"
-                info={project?.accessInfo}
-                icon={<Lock className="size-5" />}
-              />
-            )}
-            <Card className="p-4! gap-2">
-              <CardHeader className="flex items-center p-0">
-                <CardTitle className="flex-1 text-neutral-600">
-                  Assigned Employees
-                </CardTitle>
+          {tab == "Overview" && (
+            <>
+              {project?.accessInfo && (
+                <InfoCard
+                  title="Access Information"
+                  info={project?.accessInfo}
+                  icon={<Lock className="size-5" />}
+                />
+              )}
+              <Card className="p-4! gap-2">
+                <CardHeader className="flex items-center p-0">
+                  <CardTitle className="flex-1 text-neutral-600">
+                    Assigned Employees
+                  </CardTitle>
 
-                <CardAction>
+                  <CardAction>
+                    <Button
+                      variant={"ghost"}
+                      size={"icon-sm"}
+                      onClick={() => setTab("Team")}
+                    >
+                      <ChevronRight />
+                    </Button>
+                  </CardAction>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <AvatarGroup className="grayscale">
+                    {assignedEmployees?.map((employee: User) => (
+                      <Avatar key={employee?.id} className="size-16">
+                        <AvatarImage
+                          src={employee?.photo}
+                          alt={employee?.name}
+                        />
+                        <AvatarFallback>
+                          <UserRound />
+                        </AvatarFallback>
+                      </Avatar>
+                    ))}
+                    {assignedEmployees?.length > 3 && (
+                      <AvatarGroupCount>+ {-3}</AvatarGroupCount>
+                    )}
+                  </AvatarGroup>
+                </CardContent>
+              </Card>
+            </>
+          )}
+          {tab == "Team" && (
+            <>
+              <Card className="p-4! gap-2">
+                <CardHeader className="flex items-center p-0">
+                  <CardTitle className="flex-1 text-neutral-600">
+                    Assigned Employees
+                  </CardTitle>
+
+                  <CardAction>
+                    <Button
+                      variant={"ghost"}
+                      size={"icon-sm"}
+                      onClick={() => setTab("Team")}
+                    >
+                      <ChevronRight />
+                    </Button>
+                  </CardAction>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <div className="space-y-3">
+                    {assignedEmployees?.map((employee: any) => (
+                      <EmployeeRoleCard
+                        key={employee?.id}
+                        employee={employee}
+                      />
+                    ))}
+                  </div>
+                </CardContent>
+                <CardFooter className="p-0 mt-3">
                   <Button
-                    variant={"ghost"}
-                    size={"icon-sm"}
-                    onClick={() => setTab("Team")}
+                    variant={"outline"}
+                    className="w-full"
+                    onClick={() => setOpenDialog(true)}
                   >
-                    <ChevronRight />
+                    <Plus /> Add Employee
                   </Button>
-                </CardAction>
-              </CardHeader>
-              <CardContent className="p-0">
-                <AvatarGroup className="grayscale">
-                  {assignedEmployees?.map((employee:User) => (
-                    <Avatar key={employee?.id} className="size-16">
-                      <AvatarImage src={employee?.photo} alt={employee?.name} />
-                      <AvatarFallback>
-                        <UserRound />
-                      </AvatarFallback>
-                    </Avatar>
-                  ))}
-                  {assignedEmployees?.length > 3 && (
-                    <AvatarGroupCount>+ {-3}</AvatarGroupCount>
-                  )}
-                </AvatarGroup>
-              </CardContent>
-            </Card>
-          </>
-        )}
-        {tab == "Team" && (
-          <>
-            <Card className="p-4! gap-2">
-              <CardHeader className="flex items-center p-0">
-                <CardTitle className="flex-1 text-neutral-600">
-                  Assigned Employees
-                </CardTitle>
-
-                <CardAction>
-                  <Button
-                    variant={"ghost"}
-                    size={"icon-sm"}
-                    onClick={() => setTab("Team")}
-                  >
-                    <ChevronRight />
-                  </Button>
-                </CardAction>
-              </CardHeader>
-              <CardContent className="p-0">
-                <AvatarGroup className="grayscale">
-                  {assignedEmployees?.map((employee:User) => (
-                    <Avatar key={employee?.id} className="size-16">
-                      <AvatarImage src={employee?.photo} alt={employee?.name} />
-                      <AvatarFallback>
-                        <UserRound />
-                      </AvatarFallback>
-                    </Avatar>
-                  ))}
-                  {assignedEmployees?.length > 3 && (
-                    <AvatarGroupCount>+ {-3}</AvatarGroupCount>
-                  )}
-                </AvatarGroup>
-              </CardContent>
-              <CardFooter className="p-0 mt-3">
-                <Button variant={"outline"} className="w-full" onClick={()=>setOpenDialog(true)}><Plus/> Add Employee</Button>
-              </CardFooter>
-            </Card>
-          </>
-        )}
+                </CardFooter>
+              </Card>
+            </>
+          )}
+        </div>
       </div>
-    </div>
-    <AssignEmployeeFormDialog projectId={project?.id} open={openDialog} onOpenChange={setOpenDialog} />
-   </>
+      <AssignEmployeeFormDialog
+        projectId={project?.id}
+        open={openDialog}
+        onOpenChange={setOpenDialog}
+      />
+    </>
   );
 }
