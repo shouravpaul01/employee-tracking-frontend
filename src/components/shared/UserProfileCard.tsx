@@ -1,6 +1,7 @@
+// src\components\shared\UserProfileCard.tsx
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import { Mail, ShieldCheck, User } from "lucide-react";
+import { ShieldCheck, User } from "lucide-react";
 
 export function UserProfileCard({
   wrapperClassName,
