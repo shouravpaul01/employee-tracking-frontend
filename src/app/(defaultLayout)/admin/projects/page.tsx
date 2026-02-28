@@ -1,3 +1,4 @@
+// src\app\(defaultLayout)\admin\projects\page.tsx
 "use client";
 import { useState, useMemo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
