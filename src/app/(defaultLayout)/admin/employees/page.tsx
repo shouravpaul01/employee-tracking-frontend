@@ -1,3 +1,4 @@
+// src\app\(defaultLayout)\admin\employees\page.tsx
 "use client";
 
 import Header from "@/components/shared/Header";
@@ -8,7 +9,7 @@ import {
   TableCell,
   TableRow,
 } from "@/components/ui/table";
-import { useGetAllUsersInfiniteQuery } from "@/redux/api/userApi";
+import { useGetAllUsersInfiniteInfiniteQuery } from "@/redux/api/userApi";
 
 import { useEffect, useRef } from "react";
 
@@ -19,7 +20,7 @@ export default function Page() {
     hasNextPage,
     isFetchingNextPage,
     isLoading,
-  } = useGetAllUsersInfiniteQuery({ limit: 30 });
+  } = useGetAllUsersInfiniteInfiniteQuery({ limit: 30 });
 
   // Flatten pages
   const users =
