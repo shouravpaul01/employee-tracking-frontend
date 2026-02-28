@@ -5,12 +5,14 @@ const withPWA = withPWAInit({
   dest: "public",
   register: true,
   skipWaiting: true,
-  disable: process.env.NODE_ENV === "development" ? false : true, 
+ 
+  disable: process.env.NODE_ENV === "development",
 });
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  turbopack: {}, 
+  turbopack: {}, // optional, silences Turbopack warning
+  outputFileTracingRoot: __dirname, // solves lockfile root warning
 };
 
-export default withPWA(nextConfig as any);
+export default withPWA(withPWA as any);
