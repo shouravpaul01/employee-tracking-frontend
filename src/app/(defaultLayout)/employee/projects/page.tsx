@@ -31,7 +31,7 @@ export default function Page() {
   }), [activeTab, debouncedSearch]);
 
 
- 
+ console.log(queryArg)
    // Infinite query hook for assigned projects
    const {
      data,

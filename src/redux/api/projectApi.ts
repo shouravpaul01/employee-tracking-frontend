@@ -84,6 +84,18 @@ export const projectApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Project"],
     }),
+     updateProjectMedia: builder.mutation({
+      query: ({ id, data }) => {
+       
+
+        return {
+          url: `/projects/${id}/media`,
+          method: "PATCH",
+          body: data,
+        };
+      },
+      invalidatesTags: ["Project"],
+    }),
   }),
 });
 
@@ -94,4 +106,5 @@ export const {
   useGetSingleProjectQuery,
   useUpdateProjectMutation,
   useDeleteProjectMutation,
+  useUpdateProjectMediaMutation,
 } = projectApi;

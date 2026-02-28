@@ -9,6 +9,8 @@ import { statusColors } from "@/constant";
 import { formatStatus } from "@/utils/formatStatus";
 import { useState } from "react";
 import { CreateProjectFormDialog } from "./CreateProjectFormDialog";
+import { useAppSelector } from "@/redux/hooks";
+import { RootState } from "@/redux/store";
 
 export default function ProjectCard({
   data,
@@ -23,7 +25,7 @@ export default function ProjectCard({
 }) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const router = useRouter();
-
+ const { user } = useAppSelector((state: RootState) => state.auth);
   const {
     id,
     name,
@@ -34,7 +36,7 @@ export default function ProjectCard({
     todayAssignedEmployees,
   } = data;
 
-  console.log(id, "dkkjd");
+
   return (
     <>
       <div className="bg-white p-4 border rounded-lg space-y-2 ">
@@ -82,7 +84,7 @@ export default function ProjectCard({
             <Button
               variant={"secondary"}
               size={"sm"}
-              onClick={() => router.push(`/admin/projects/${data?.id}`)}
+              onClick={() => router.push(`/${user?.role==="ADMIN"?"admin":"employee"}/projects/${data?.id}`)}
             >
               <Eye /> View
             </Button>
