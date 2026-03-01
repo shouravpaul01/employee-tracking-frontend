@@ -1,190 +1,196 @@
-// src\components\quotes\QuotePDFDocument.tsx
-import React from 'react';
-import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
-import { QuoteData } from '@/type';
+import React from "react";
+import {
+  Document,
+  Page,
+  Text,
+  View,
+  StyleSheet,
+  Image,
+} from "@react-pdf/renderer";
+import { QuoteData } from "@/type";
+import pdfLogo from '../../../public/pdfLogo.png'
 
-// Create styles
+// Create styles optimized for single page layout
 const styles = StyleSheet.create({
   page: {
-    padding: 40,
-    backgroundColor: '#ffffff',
-    fontFamily: 'Helvetica',
+    padding: 30,
+    backgroundColor: "#ffffff",
+    fontFamily: "Helvetica",
+    display: "flex",
+    flexDirection: "column",
   },
   // Header Section
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 40,
-    borderBottomWidth: 2,
-    borderBottomColor: '#e5e5e5',
-    paddingBottom: 20,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#000000",
+    paddingBottom: 10,
   },
   logoSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
-  logoBox: {
-    width: 40,
-    height: 40,
-    backgroundColor: '#1a1a1a',
-    borderRadius: 4,
-    marginRight: 12,
+  logoImage: {
+    width: 30,
+    height: 30,
+    marginRight: 10,
   },
   companyContainer: {
-    flexDirection: 'column',
+    flexDirection: "column",
   },
   companyName: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1a1a1a',
-    lineHeight: 1.2,
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#000000",
+    lineHeight: 1.1,
   },
   companySub: {
-    fontSize: 12,
-    color: '#666666',
-    letterSpacing: 1,
-    marginTop: 2,
+    fontSize: 10,
+    color: "#000000",
+    letterSpacing: 0.5,
+    marginTop: 1,
   },
   quoteTitle: {
-    fontSize: 36,
-    fontWeight: 'bold',
-    color: '#1a1a1a',
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#000000",
   },
   // Meta Section
   metaSection: {
-    alignItems: 'flex-end',
-    marginBottom: 30,
+    alignItems: "flex-end",
+    marginBottom: 12,
+    fontSize: 10,
+    color: "#000000",
   },
   metaText: {
     fontSize: 10,
-    color: '#666666',
+    color: "#000000",
     marginBottom: 2,
   },
   // Client Card
-  clientCard: {
-    borderWidth: 2,
-    borderColor: '#4f46e5',
-    borderRadius: 8,
-    padding: 20,
-    marginBottom: 30,
-  },
+ 
   clientLabel: {
-    color: '#4f46e5',
-    fontSize: 12,
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
-    marginBottom: 12,
-    letterSpacing: 1,
+    color: "#000000",
+    fontSize: 10,
+    fontWeight: "bold",
+    textTransform: "uppercase",
+    marginBottom: 6,
+    letterSpacing: 0.5,
   },
   clientName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#1a1a1a',
-    marginBottom: 8,
+    fontSize: 13,
+    fontWeight: "bold",
+    color: "#000000",
+    marginBottom: 3,
   },
   clientDetail: {
-    fontSize: 11,
-    color: '#666666',
-    marginBottom: 4,
+    fontSize: 10,
+    color: "#000000",
+    marginBottom: 2,
+    lineHeight: 1.2,
   },
   // Package Badge
   packageBadge: {
-    backgroundColor: '#eef2ff',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 6,
-    marginBottom: 20,
-    alignSelf: 'flex-start',
+    backgroundColor: "#f0f0f0",
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 4,
+    marginBottom: 12,
+    alignSelf: "flex-start",
   },
   packageText: {
-    color: '#4f46e5',
-    fontSize: 12,
-    fontWeight: 'bold',
+    color: "#000000",
+    fontSize: 11,
+    fontWeight: "bold",
   },
   // Table
   table: {
-    marginTop: 20,
-    marginBottom: 30,
+    marginBottom: 12,
   },
   tableHeader: {
-    flexDirection: 'row',
-    borderBottomWidth: 2,
-    borderBottomColor: '#e5e5e5',
-    paddingBottom: 10,
-    marginBottom: 10,
+    flexDirection: "row",
+    borderTopWidth: 1,
+    borderTopColor: "#000000",
+    borderBottomWidth: 1,
+    borderBottomColor: "#000000",
+    paddingVertical: 6,
+    marginBottom: 6,
   },
   tableHeaderText: {
-    fontSize: 11,
-    fontWeight: 'bold',
-    color: '#666666',
-    textTransform: 'uppercase',
+    fontSize: 10,
+    fontWeight: "bold",
+    color: "#000000",
+    textTransform: "uppercase",
   },
   tableRow: {
-    flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e5e5e5',
-    paddingVertical: 10,
+    flexDirection: "row",
+    borderBottomWidth: 0.5,
+    borderBottomColor: "#e5e5e5",
+    paddingVertical: 6,
   },
   roomCell: {
-    flex: 3,
+    flex: 3.5,
   },
   amountCell: {
     flex: 1,
-    textAlign: 'right',
+    textAlign: "right",
   },
   roomName: {
-    fontSize: 11,
-    fontWeight: 'bold',
-    color: '#1a1a1a',
+    fontSize: 10,
+    fontWeight: "bold",
+    color: "#000000",
     marginBottom: 2,
   },
   roomItems: {
-    fontSize: 9,
-    color: '#666666',
+    fontSize: 8,
+    color: "#000000",
     marginTop: 2,
+    lineHeight: 1.3,
   },
   // Totals Section
   totalsSection: {
-    marginTop: 30,
-    borderTopWidth: 2,
-    borderTopColor: '#1a1a1a',
-    paddingTop: 20,
+    marginTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: "#000000",
+    paddingTop: 8,
   },
   totalRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-    fontSize: 11,
-    color: '#666666',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 5,
+    fontSize: 10,
+    color: "#000000",
   },
   discountRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-    fontSize: 11,
-    color: '#dc2626',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 5,
+    fontSize: 10,
+    color: "#000000",
   },
   grandTotal: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 12,
-    paddingTop: 12,
-    borderTopWidth: 2,
-    borderTopColor: '#e5e5e5',
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#1a1a1a',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 6,
+    paddingTop: 6,
+    borderTopWidth: 1,
+    borderTopColor: "#000000",
+    fontSize: 12,
+    fontWeight: "bold",
+    color: "#000000",
   },
   // Footer
   footer: {
-    marginTop: 50,
-    textAlign: 'center',
-    fontSize: 9,
-    color: '#999999',
-    borderTopWidth: 1,
-    borderTopColor: '#e5e5e5',
-    paddingTop: 20,
+    marginTop: "auto",
+    textAlign: "center",
+    fontSize: 8,
+    color: "#000000",
+    borderTopWidth: 0.5,
+    borderTopColor: "#e5e5e5",
+    paddingTop: 8,
   },
   footerText: {
     marginBottom: 2,
@@ -195,18 +201,19 @@ interface QuotePDFDocumentProps {
   quote: QuoteData;
 }
 
-export const QuotePDFDocument: React.FC<QuotePDFDocumentProps> = ({ quote }) => {
+export const QuotePDFDocument: React.FC<QuotePDFDocumentProps> = ({
+  quote,
+}) => {
   // Calculate per room amount
-  const perRoomAmount = quote.rooms.length > 0 
-    ? quote.estimatedTotal / quote.rooms.length 
-    : 0;
-  
+  const perRoomAmount =
+    quote.rooms.length > 0 ? quote.estimatedTotal / quote.rooms.length : 0;
+
   // Calculate discount amount
   const discountAmount = (quote.estimatedTotal * quote.discountPercent) / 100;
 
   // Format currency
   const formatCurrency = (amount: number): string => {
-    return `$${amount.toLocaleString('en-US', {
+    return `$${amount.toLocaleString("en-US", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     })}`;
@@ -218,7 +225,22 @@ export const QuotePDFDocument: React.FC<QuotePDFDocumentProps> = ({ quote }) => 
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.logoSection}>
-            <View style={styles.logoBox} />
+            {/* Option 1: If you have the image as a public asset */}
+            <Image src={"../../../public/pdfLogo.png"} style={styles.logoImage} />
+            {/* 
+            Option 2: If you want to use base64 encoded image instead:
+            <Image
+              src="data:image/png;base64,YOUR_BASE64_STRING_HERE"
+              style={styles.logoImage}
+            />
+            
+            Option 3: If you want to use a URL:
+            <Image
+              src="https://your-domain.com/pdfLogo.png"
+              style={styles.logoImage}
+            />
+            */}
+
             <View style={styles.companyContainer}>
               <Text style={styles.companyName}>SURFSIDE</Text>
               <Text style={styles.companySub}>STAGING</Text>
@@ -228,32 +250,40 @@ export const QuotePDFDocument: React.FC<QuotePDFDocumentProps> = ({ quote }) => 
         </View>
 
         {/* Quote Meta */}
-        <View style={styles.metaSection}>
-          <Text style={styles.metaText}>Quote No. {quote.quoteNumber}</Text>
-          <Text style={styles.metaText}>{quote.quoteDate}</Text>
-        </View>
 
         {/* Client Information */}
-        <View style={styles.clientCard}>
-          <Text style={styles.clientLabel}>PREPARED FOR:</Text>
-          <Text style={styles.clientName}>{quote.clientName}</Text>
-          <Text style={styles.clientDetail}>{quote.clientAddress}</Text>
-          <Text style={styles.clientDetail}>{quote.clientEmail}</Text>
-          <Text style={styles.clientDetail}>{quote.clientPhone}</Text>
-        </View>
-
-        {/* Package (if selected) */}
-        {quote.packageName && (
-          <View style={styles.packageBadge}>
-            <Text style={styles.packageText}>{quote.packageName}</Text>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            marginBottom: 12,
+          }}
+        >
+          {/* Client Card on the left */}
+          <View>
+            <Text style={styles.clientLabel}>PREPARED FOR:</Text>
+            <Text style={styles.clientName}>{quote.clientName}</Text>
+            <Text style={styles.clientDetail}>{quote.clientAddress}</Text>
+            <Text style={styles.clientDetail}>{quote.clientEmail}</Text>
+            <Text style={styles.clientDetail}>{quote.clientPhone}</Text>
           </View>
-        )}
+
+          {/* Meta Section on the right */}
+          <View style={styles.metaSection}>
+            {/* <Text style={styles.metaText}>Quote No. {quote.quoteNumber}</Text> */}
+            <Text style={styles.metaText}>{quote.quoteDate}</Text>
+          </View>
+        </View>
 
         {/* Rooms Table */}
         <View style={styles.table}>
           <View style={styles.tableHeader}>
-            <Text style={[styles.tableHeaderText, styles.roomCell]}>Room / Items</Text>
-            <Text style={[styles.tableHeaderText, styles.amountCell]}>Amount</Text>
+            <Text style={[styles.tableHeaderText, styles.roomCell]}>
+              {quote.packageName}
+            </Text>
+            <Text style={[styles.tableHeaderText, styles.amountCell]}>
+              Total
+            </Text>
           </View>
 
           {quote.rooms.map((room, index) => (
@@ -261,10 +291,12 @@ export const QuotePDFDocument: React.FC<QuotePDFDocumentProps> = ({ quote }) => 
               <View style={styles.roomCell}>
                 <Text style={styles.roomName}>{room.name}</Text>
                 {room.items.length > 0 && (
-                  <Text style={styles.roomItems}>{room.items.join(' • ')}</Text>
+                  <Text style={styles.roomItems}>{room.items.join(", ")}</Text>
                 )}
               </View>
-              <Text style={styles.amountCell}>{formatCurrency(perRoomAmount)}</Text>
+              {/* <Text style={styles.amountCell}>
+                {formatCurrency(perRoomAmount)}
+              </Text> */}
             </View>
           ))}
         </View>
@@ -284,15 +316,17 @@ export const QuotePDFDocument: React.FC<QuotePDFDocumentProps> = ({ quote }) => 
           )}
 
           <View style={styles.grandTotal}>
-            <Text>Total Amount</Text>
+            <Text>Total</Text>
             <Text>{formatCurrency(quote.totalAmount)}</Text>
           </View>
         </View>
 
         {/* Footer */}
         <View style={styles.footer}>
-          <Text style={styles.footerText}>Thank you for choosing Surfside Staging</Text>
-          <Text style={styles.footerText}>This quote is valid for 30 days from {quote.quoteDate}</Text>
+          <Text style={styles.footerText}>
+            Thank you for choosing Surfside Staging
+          </Text>
+          
         </View>
       </Page>
     </Document>
