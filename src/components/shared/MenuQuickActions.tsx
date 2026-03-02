@@ -1,19 +1,22 @@
 // src\components\shared\MenuQuickActions.tsx
-"use client"
-import { ChevronRight, FileText, UserPlus, Bell, Users } from "lucide-react"
-import { CreateUserFormDialog } from "../admin/profile/CreateUserFormDialog"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { useAppSelector } from "@/redux/hooks"
-import { RootState } from "@/redux/store"
-import { UserRole } from "@/type"
+"use client";
+import { ChevronRight, FileText, UserPlus, Bell, Users, KeySquare } from "lucide-react";
+import { CreateUserFormDialog } from "../admin/profile/CreateUserFormDialog";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAppSelector } from "@/redux/hooks";
+import { RootState } from "@/redux/store";
+import { UserRole } from "@/type";
+import { ChangePasswordFormDialog } from "./ChangePasswordFormDialog";
 
 export function MenuQuickActions() {
-  const router = useRouter()
-  const [openDialog, setOpenDialog] = useState(false)
-  const { user } = useAppSelector((state: RootState) => state.auth)
+  const router = useRouter();
+  const [openDialog, setOpenDialog] = useState(false);
+  const [openChangePasswordDialog, setOpenChangePasswordDialog] =
+    useState(false);
+  const { user } = useAppSelector((state: RootState) => state.auth);
 
-  const role = user?.role
+  const role = user?.role;
 
   const actions = [
     {
@@ -31,7 +34,7 @@ export function MenuQuickActions() {
     {
       title: "Notifications",
       icon: Bell,
-      onClick: () => {},
+      onClick: () => {router.push("/notifications")},
       roles: ["ADMIN", "EMPLOYEE"],
     },
     {
@@ -40,11 +43,17 @@ export function MenuQuickActions() {
       onClick: () => router.push("/admin/employees"),
       roles: ["ADMIN"],
     },
-  ]
+    {
+      title: "Change Password",
+      icon: KeySquare,
+      onClick: () => {setOpenChangePasswordDialog(true)},
+      roles: ["ADMIN", "EMPLOYEE"],
+    },
+  ];
 
-  const filteredActions = actions.filter(action =>
-    action.roles.includes(role as UserRole)
-  )
+  const filteredActions = actions.filter((action) =>
+    action.roles.includes(role as UserRole),
+  );
 
   return (
     <>
@@ -69,6 +78,10 @@ export function MenuQuickActions() {
       </div>
 
       <CreateUserFormDialog open={openDialog} onOpenChange={setOpenDialog} />
+      <ChangePasswordFormDialog
+        open={openChangePasswordDialog}
+        onOpenChange={setOpenChangePasswordDialog}
+      />
     </>
-  )
+  );
 }
