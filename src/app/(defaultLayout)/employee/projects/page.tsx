@@ -12,7 +12,6 @@ import { projectStatus } from "@/constant";
 
 import ProjectCardSkeleton from "@/components/shared/ProjectCardSkeleton";
 import { useDebounce } from "@/hooks/useDebounce";
-import { useGetAllProjectsInfiniteInfiniteQuery } from "@/redux/api/projectApi";
 import { useGetAssignedProjectsInfiniteInfiniteQuery } from "@/redux/api/assingedEmployeeApi";
 import { format } from "date-fns";
 
@@ -67,16 +66,7 @@ export default function Page() {
     <div className="h-screen flex flex-col">
       <Header
         title="Projects"
-        rightContent={
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            className="rounded-full text-primary hover:text-primary cursor-pointer"
-            onClick={() => setCreateDialogOpen(true)}
-          >
-            <BadgePlus className="size-6" />
-          </Button>
-        }
+       
       />
 
       <div className="container py-3 flex-1 overflow-hidden flex flex-col">

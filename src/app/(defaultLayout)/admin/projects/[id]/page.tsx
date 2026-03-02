@@ -1,12 +1,19 @@
 "use client";
 import ProjectCard from "@/components/projects/ProjectCard";
-import AccessInfoCard from "@/components/shared/InfoCard";
+
 import Header from "@/components/shared/Header";
 import Loading from "@/components/shared/Loading";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useGetSingleProjectQuery } from "@/redux/api/projectApi";
 import { Project, User } from "@/type";
-import { ChevronRight, Lock, Plus, UserRound } from "lucide-react";
+import {
+  ChevronRight,
+  ImageIcon,
+  Images,
+  Lock,
+  Plus,
+  UserRound,
+} from "lucide-react";
 import React, { use, useState } from "react";
 import InfoCard from "@/components/shared/InfoCard";
 import {
@@ -29,6 +36,8 @@ import { AssignEmployeeFormDialog } from "@/components/admin/assignedEmployee/As
 import { Badge } from "@/components/ui/badge";
 import UpdateRoleSelect from "@/components/shared/UpdateRoleSelect";
 import EmployeeRoleCard from "@/components/shared/EmployeeRoleCard";
+import PhotoGallery from "@/components/shared/PhotoGallery";
+import VideoGalleryCard from "@/components/shared/VideoGalleryCard";
 
 export default function page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -138,6 +147,53 @@ export default function page({ params }: { params: Promise<{ id: string }> }) {
                     <Plus /> Add Employee
                   </Button>
                 </CardFooter>
+              </Card>
+            </>
+          )}
+          {tab == "Media" && (
+            <>
+              <VideoGalleryCard
+                videos={
+                  [
+                    project.walkthroughVideo && {
+                      url: project.walkthroughVideo,
+                      type: "WALKTHROUGH",
+                    },
+                    project.stagedVideo && {
+                      url: project.stagedVideo,
+                      type: "STAGING",
+                    },
+                    project.beforeDestageVideo && {
+                      url: project.beforeDestageVideo,
+                      type: "BEFOREDESTAGE",
+                    },
+                    project.destagedVideo && {
+                      url: project.destagedVideo,
+                      type: "DESTAGING",
+                    },
+                  ].filter(Boolean) as any
+                }
+              />
+
+              <Card className="border border-border">
+                <CardHeader>
+                  <div className="flex items-center gap-2">
+                    <ImageIcon className="w-5 h-5 text-primary" />
+                    <CardTitle>Project Photos</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {project?.photos!.length > 0 ? (
+                    <PhotoGallery photos={project?.photos as string[]} />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-border rounded-xl text-muted-foreground">
+                      <Images className="w-12 h-12 mb-4" />
+                      <p className="text-sm font-medium">
+                        No photos available for this project
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
               </Card>
             </>
           )}
