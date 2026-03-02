@@ -54,12 +54,6 @@ export default function DashboardPage() {
               iconClassName="bg-primary/10 text-primary"
             />
 
-            {/* <StatsCard
-          title="Hours Logged"
-          value={8} // Replace with actual calculation if available
-          icon={<Clock />}
-          iconClassName="bg-yellow-100 text-yellow-500"
-        /> */}
             <StatsCard
               title="Pending Expenses"
               value={summary?.pendingExpenses}
