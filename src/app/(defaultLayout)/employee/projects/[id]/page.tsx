@@ -129,7 +129,7 @@ export default function page({ params }: { params: Promise<{ id: string }> }) {
           </>
         )}
         {
-          tab=="Media" && <MediaUploadCard projectId={project?.id} />
+          tab=="Media" && <MediaUploadCard project={project} />
         }
       </div>
     </div>

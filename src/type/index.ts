@@ -22,6 +22,7 @@ export type ProjectStatus =
   | "PENDING"
   | "STAGING"
   | "WALKTHROUGH"
+  | "BEFOREDESTAGE"
   | "DESTAGING"
   | "COMPLETED";
 
