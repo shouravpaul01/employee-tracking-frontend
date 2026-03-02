@@ -54,12 +54,6 @@ export default function DashboardPage() {
               iconClassName="bg-primary/10 text-primary"
             />
 
-            {/* <StatsCard
-          title="Hours Logged"
-          value={8} // Replace with actual calculation if available
-          icon={<Clock />}
-          iconClassName="bg-yellow-100 text-yellow-500"
-        /> */}
             <StatsCard
               title="Pending Expenses"
               value={summary?.pendingExpenses}
@@ -108,7 +102,7 @@ export default function DashboardPage() {
                       <TableCell className="text-right">
                         <Badge
                           variant="outline"
-                          className={`py-1 px-2 ${statusColors[project?.status as ProjectStatus]}`}
+                          className={`py-1 px-2 ${statusColors[project?.status as any]}`}
                         >
                           {formatStatus(project?.status)}
                         </Badge>
