@@ -41,7 +41,7 @@ export default function page() {
     <div>
       <Header title="Profile" />
       <div className="container space-y-4">
-        <UserProfileCard data={user}  />
+        <UserProfileCard data={user}  isEditableAvatar={true} />
         <div className="grid grid-cols-3 gap-2.5">
           <StateCount count={summery?.totalProjects || 0} title="Projects" />
           <StateCount count={`${summery?.totalEmployeeMonthlyHours || 0}h`} title="This Month" />
