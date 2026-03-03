@@ -17,7 +17,6 @@ export const assignedEmployeeApi = baseApi.injectEndpoints({
       query: ({ id, status }) => ({
         url: `/assigned-employee/update-attendance-time/${id}?status=${status}`,
         method: "PATCH",
-      
       }),
       invalidatesTags: ["AssignedEmployee"],
     }),
@@ -110,6 +109,26 @@ export const assignedEmployeeApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["AssignedEmployee"],
     }),
+    getEmployeesWeeklySummery: builder.query({
+      query: (args) => {
+        const params = new URLSearchParams();
+
+        if (args) {
+          Object.entries(args).forEach(([key, value]) => {
+            if (value !== undefined && value !== null && value !== "") {
+              params.append(key, value.toString());
+            }
+          });
+        }
+
+        return {
+          url: "/assigned-employee/employees-weekly-summary",
+          method: "GET",
+          params,
+        };
+      },
+      providesTags: ["AssignedEmployee"],
+    }),
   }),
 });
 
@@ -120,5 +139,6 @@ export const {
   useGetAssignedProjectsQuery,
   useUpdateAssignedEmployeeRoleMutation,
   useGetRecentEntriesQuery,
-  useGetSingleAssignedProjectQuery
+  useGetSingleAssignedProjectQuery,
+  useGetEmployeesWeeklySummeryQuery,
 } = assignedEmployeeApi;
